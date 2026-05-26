@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": "../../../../../../ms-logistics-base"
+		},
+		{
+			"path": "../../../../.."
+		},
+		{
+			"path": "../../../../../../../front/frontend-fullstack"
+		}
+	],
+	"settings": {
+		"java.compile.nullAnalysis.mode": "automatic"
+	}
+}
