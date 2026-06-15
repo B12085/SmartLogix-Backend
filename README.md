@@ -513,7 +513,7 @@ Habilitado en ambos microservicios:
 
 ### Seguridad
 
-En desarrollo, todos los endpoints son públicos (sin autenticación). Para producción, implementar JWT o OAuth2.
+En desarrollo, todos los endpoints son públicos (sin autenticación).
 
 ### Variables de Entorno (Frontend)
 
@@ -558,29 +558,3 @@ curl http://localhost:8082/api/pedidos/listar
 # Frontend
 curl http://localhost:5173
 ```
-
-## Solución de Problemas
-
-Consulta `SOLUCION_PROBLEMAS.md` para errores comunes como:
-- CORS bloqueado
-- Conexión rechazada
-- Tablas no existen
-- Stock insuficiente
-- Puertos en uso
-
-Consulta `CONFIGURACION_MICROSERVICIOS.md` para detalles técnicos de la configuración.
-
-## Próximas Mejoras
-
-- Autenticación JWT
-- Logging con SLF4J
-- Tests unitarios
-- Caché con Redis
-- API documentation (Swagger)
-- Containerización con Docker
-- CI/CD con GitHub Actions
-
----
-
-**Última actualización**: 2026-05-26  
-**Estado**: Completamente funcional
