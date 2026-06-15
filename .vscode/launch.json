@@ -1,0 +1,74 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-MsLogisticsBaseApplication<ms-logistics-base>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "ms_logistics_base.MsLogisticsBaseApplication",
+            "projectName": "ms-logistics-base",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-MsLogisticsBaseApplication<ms-pedidos>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "ms_logistics_base.MsLogisticsBaseApplication",
+            "projectName": "ms-pedidos",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-MsLogisticsBaseApplication<ms-transportistas>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "ms_logistics_base.MsLogisticsBaseApplication",
+            "projectName": "ms-transportistas",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-MsLogisticsBaseApplication<ms-envios>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.smartlogix.envios.MsLogisticsBaseApplication",
+            "projectName": "ms-envios",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-MsLogisticsBaseApplication<ms-logistics-base>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.smartlogix.logisticsbase.MsLogisticsBaseApplication",
+            "projectName": "ms-logistics-base",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-MsLogisticsBaseApplication<ms-pedidos>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.smartlogix.pedidos.MsLogisticsBaseApplication",
+            "projectName": "ms-pedidos",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-MsLogisticsBaseApplication<ms-transportistas>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.smartlogix.transportistas.MsLogisticsBaseApplication",
+            "projectName": "ms-transportistas",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}

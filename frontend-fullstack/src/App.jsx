@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import { inventarioService, pedidosService } from './services/apiService'
+import Transportistas from './pages/Transportistas'
+import Envios from './pages/Envios'
 
 function App() {
   const [pestanaActiva, setPestanaActiva] = useState('inventario')
@@ -374,6 +376,24 @@ function App() {
         >
           Gestión de Pedidos
         </button>
+        <button
+          style={{
+            ...estilos.botonPestana,
+            ...(pestanaActiva === 'transportistas' ? estilos.botonPestanaActiva : {})
+          }}
+          onClick={() => setPestanaActiva('transportistas')}
+        >
+          Transportistas
+        </button>
+        <button
+          style={{
+            ...estilos.botonPestana,
+            ...(pestanaActiva === 'envios' ? estilos.botonPestanaActiva : {})
+          }}
+          onClick={() => setPestanaActiva('envios')}
+        >
+          Envíos
+        </button>
       </div>
 
       {/* SECCIÓN DE INVENTARIO */}
@@ -659,6 +679,20 @@ function App() {
               </tbody>
             </table>
           )}
+        </div>
+      )}
+
+      {/* SECCIÓN DE TRANSPORTISTAS */}
+      {pestanaActiva === 'transportistas' && (
+        <div style={estilos.seccion}>
+          <Transportistas />
+        </div>
+      )}
+
+      {/* SECCIÓN DE ENVIOS */}
+      {pestanaActiva === 'envios' && (
+        <div style={estilos.seccion}>
+          <Envios />
         </div>
       )}
     </div>

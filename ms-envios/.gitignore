@@ -1,0 +1,13 @@
+# Ignore Maven build output
+target/
+
+# Ignore IntelliJ files
+.idea
+*.iml
+
+# Ignore VS Code settings
+.vscode/
+
+# Ignore Maven wrapper jar
+target/
+.mvn/wrapper/maven-wrapper.jar

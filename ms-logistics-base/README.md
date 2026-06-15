@@ -1,58 +1,92 @@
-# SmartLogix - Microservicio de Inventario (Puerto 8081)
+# ms-logistics-base - Microservicio de Inventario
 
-Módulo independiente especializado en control de existencias, catalogación de productos y movimientos físicos en bodega dentro del ecosistema SmartLogix.
+Módulo independiente especializado en control de existencias, catalogación de productos y movimientos de inventario dentro del ecosistema SmartLogix.
 
-## Stack y Arquitectura
+## 📋 Especificaciones Técnicas
 
-Implementado con Java 17 y Spring Boot 4 en un enfoque tradicional: código fuente puro, constructores y getters/setters escritos manualmente para máxima transparencia. 
+| Propiedad | Valor |
+|-----------|-------|
+| **Puerto** | 8081 |
+| **Spring Boot** | 3.3.0 |
+| **Java** | 21 LTS |
+| **Base de Datos** | MySQL (smartlogix) |
+| **Tabla Principal** | producto |
+| **ORM** | Spring Data JPA + Hibernate |
+| **OpenAPI** | SpringDoc 2.3.0 |
 
-Las validaciones de negocio (stock y precio no negativos) se aplican a nivel de servicio mediante condicionales tradicionales, garantizando que el sistema rechace operaciones que comprometan la integridad de datos. La persistencia corre sobre MySQL (`db_smartlogix_inventario`) mediante Spring Data JPA, con migración automática de esquema.
+## 🛠️ Stack y Arquitectura
 
-## Endpoints REST
+**Tecnologías**:
+- Java 21 LTS
+- Spring Boot 3.3.0 con Spring Data JPA
+- MySQL para persistencia
+- JaCoCo v0.8.11 para cobertura de código
+
+**Características**:
+- Código POJO explícito (sin Lombok)
+- Validaciones de negocio a nivel de servicio
+- Restricciones: precio ≥ 0, stock ≥ 0
+- Migrations automáticas de esquema (DDL-auto: update)
+
+## 🔌 Endpoints REST
 
 ### Registrar Producto
 ```http
 POST /api/productos/registrar
+Content-Type: application/json
 ```
-Solicitud:
+
+**Solicitud**:
 ```json
 {
   "codigoSku": "SKU-001",
-  "nombre": "Producto Ejemplo",
-  "descripcion": "Descripción del producto",
+  "nombre": "Laptop Dell",
+  "descripcion": "Laptop XPS 13",
   "cantidadStock": 100,
-  "precio": 29.99
+  "precio": 1299.99
 }
 ```
-Validaciones: precio ≥ 0, stock inicial ≥ 0
 
-Respuesta (201 Created):
+**Validaciones**:
+- precio ≥ 0
+- cantidadStock ≥ 0
+- codigoSku único
+- Todos los campos requeridos
+
+**Respuesta (201 Created)**:
 ```json
 {
   "id": 1,
   "codigoSku": "SKU-001",
-  "nombre": "Producto Ejemplo",
-  "descripcion": "Descripción del producto",
+  "nombre": "Laptop Dell",
+  "descripcion": "Laptop XPS 13",
   "cantidadStock": 100,
-  "precio": 29.99
+  "precio": 1299.99
 }
 ```
 
 ### Listar Productos
 ```http
-GET http://localhost:8081/api/productos/listar
+GET /api/productos/listar
 ```
-Recupera el catálogo completo de inventario.
 
-Respuesta (200 OK):
+**Respuesta (200 OK)**:
 ```json
 [
   {
     "id": 1,
     "codigoSku": "SKU-001",
-    "nombre": "Producto Ejemplo",
-    "descripcion": "Descripción del producto",
+    "nombre": "Laptop Dell",
+    "descripcion": "Laptop XPS 13",
     "cantidadStock": 100,
+    "precio": 1299.99
+  },
+  {
+    "id": 2,
+    "codigoSku": "SKU-002",
+    "nombre": "Mouse Logitech",
+    "descripcion": "Mouse inalámbrico",
+    "cantidadStock": 500,
     "precio": 29.99
   }
 ]
@@ -60,43 +94,110 @@ Respuesta (200 OK):
 
 ### Buscar Producto por SKU
 ```http
-GET http://localhost:8081/api/productos/buscar?codigoSku=PROD-001
+GET /api/productos/buscar?codigoSku=SKU-001
 ```
-Parámetro: `codigoSku` (requerido)
 
-Respuesta (200 OK):
+**Parámetros**:
+- `codigoSku` (requerido): Código SKU del producto
+
+**Respuesta (200 OK)**:
 ```json
 {
   "id": 1,
   "codigoSku": "SKU-001",
-  "nombre": "Producto Ejemplo",
-  "descripcion": "Descripción del producto",
+  "nombre": "Laptop Dell",
+  "descripcion": "Laptop XPS 13",
   "cantidadStock": 100,
-  "precio": 29.99
+  "precio": 1299.99
 }
 ```
 
 ### Actualizar Stock
 ```http
-PUT http://localhost:8081/api/productos/actualizar-stock?codigoSku=PROD-001&cantidad=10
+PUT /api/productos/actualizar-stock?codigoSku=SKU-001&cantidad=10
 ```
-Incrementa o disminuye existencias. La operación se rechaza si genera inventario negativo.
 
-Parámetros: `codigoSku`, `cantidad` (positivo para agregar, negativo para restar)
+**Parámetros**:
+- `codigoSku` (requerido): Código SKU
+- `cantidad`: Número positivo para agregar, negativo para restar
 
-Validación: stock resultante ≥ 0
+**Validación**: El stock resultante debe ser ≥ 0
 
-Respuesta (200 OK):
+**Respuesta (200 OK)**:
 ```json
 {
   "id": 1,
   "codigoSku": "SKU-001",
-  "nombre": "Producto Ejemplo",
-  "descripcion": "Descripción del producto",
+  "nombre": "Laptop Dell",
+  "descripcion": "Laptop XPS 13",
   "cantidadStock": 110,
-  "precio": 29.99
+  "precio": 1299.99
 }
 ```
+
+## 🧪 Pruebas
+
+El servicio incluye **5 pruebas unitarias** con cobertura JaCoCo:
+
+```bash
+# Ejecutar pruebas
+mvn test
+
+# Ver cobertura
+mvn test jacoco:report
+# Acceder a: target/site/jacoco/index.html
+```
+
+**Tests incluidos**:
+1. Registrar producto válido
+2. Listar productos
+3. Buscar por SKU
+4. Actualizar stock (descontar)
+5. Validaciones de negocio
+
+## 🚀 Ejecutar Localmente
+
+```bash
+# Instalar dependencias
+mvn clean install
+
+# Ejecutar servicio
+mvn spring-boot:run
+```
+
+El servicio estará disponible en:
+- **API**: http://localhost:8081/api/productos
+- **Swagger**: http://localhost:8081/swagger-ui.html
+- **Health**: http://localhost:8081/actuator/health
+
+## 🌐 Integración en SmartLogix
+
+Este microservicio es consultado por:
+- **ms-pedidos** (validar stock al crear pedidos)
+- **frontend-fullstack** (CRUD de productos)
+
+## 📊 Estructura de Base de Datos
+
+**Tabla: producto**
+```sql
+CREATE TABLE producto (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  codigo_sku VARCHAR(50) UNIQUE NOT NULL,
+  nombre VARCHAR(255) NOT NULL,
+  descripcion TEXT,
+  cantidad_stock INT NOT NULL,
+  precio DECIMAL(10,2) NOT NULL,
+  CONSTRAINT check_cantidad CHECK (cantidad_stock >= 0),
+  CONSTRAINT check_precio CHECK (precio >= 0)
+);
+```
+
+## 📝 Notas
+
+- Las validaciones de cantidad y precio se aplican a nivel de servicio
+- La migración de esquema es automática con JPA (ddl-auto=update)
+- CORS está configurado para localhost:5173 (frontend)
+- Swagger está automáticamente disponible
 
 ## Modelo de Datos
 

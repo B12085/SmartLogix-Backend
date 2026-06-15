@@ -1,53 +1,224 @@
-# SmartLogix - Microservicio de Pedidos (Puerto 8082)
+# ms-pedidos - Microservicio de Órdenes de Compra
 
-Módulo especializado en recepción, registro y ciclo de vida de órdenes de compra solicitadas por clientes. Funciona de forma aislada del módulo de inventario pero se integra con él mediante REST calls para validar disponibilidad y descontar stock.
+Módulo especializado en recepción, registro y ciclo de vida de órdenes de compra. Integrado con ms-logistics-base mediante REST calls para validar disponibilidad y descontar stock.
 
-## Stack y Arquitectura
+## 📋 Especificaciones Técnicas
 
-Implementado con Java 17 y Spring Boot 4 manteniendo la misma filosofía de código explícito: POJOs puros sin Lombok, validaciones de negocio mediante condicionales tradicionales. La cantidad solicitada debe ser siempre mayor a cero (validación ética), y la base de datos (`db_smartlogix_pedidos`) corre sobre MySQL de forma independiente.
+| Propiedad | Valor |
+|-----------|-------|
+| **Puerto** | 8082 |
+| **Spring Boot** | 3.3.0 |
+| **Java** | 21 LTS |
+| **Base de Datos** | MySQL (smartlogix) |
+| **Tabla Principal** | pedido |
+| **ORM** | Spring Data JPA + Hibernate |
+| **OpenAPI** | SpringDoc 2.3.0 |
 
-## Endpoints REST
+## 🛠️ Stack y Arquitectura
+
+**Tecnologías**:
+- Java 21 LTS
+- Spring Boot 3.3.0 con Spring Data JPA
+- RestTemplate para integración con ms-logistics-base
+- MySQL para persistencia
+- JaCoCo v0.8.11 para cobertura de código
+
+**Características**:
+- Código POJO explícito (sin Lombok)
+- Validaciones de negocio: cantidad > 0, stock disponible
+- Integración REST con ms-logistics-base
+- Estados de pedido: PENDIENTE, PROCESANDO, COMPLETADO
+- Migrations automáticas de esquema
+
+## 🔌 Endpoints REST
 
 ### Registrar Nueva Orden
-```
+```http
 POST /api/pedidos/registrar
 Content-Type: application/json
 ```
 
-Solicitud:
+**Solicitud**:
 ```json
 {
-  "productoId": "prod-123",
-  "numeroPedido": "PED-001",
   "cliente": "Juan Pérez",
-  "descripcion": "Laptop Dell XPS 13",
-  "cantidadSolicitada": 2,
+  "descripcion": "Compra de equipos",
+  "cantidadSolicitada": 5,
   "estado": "PENDIENTE"
 }
 ```
 
-Respuesta (201 Created):
+**Validaciones**:
+- cantidadSolicitada > 0 (siempre positivo)
+- cliente no vacío
+- Se valida stock en ms-logistics-base
+- Número de pedido generado automáticamente
+
+**Respuesta (201 Created)**:
 ```json
 {
   "id": 1,
-  "productoId": "prod-123",
   "numeroPedido": "PED-001",
   "cliente": "Juan Pérez",
-  "descripcion": "Laptop Dell XPS 13",
-  "skuProducto": "SKU-DELL-XPS13",
-  "cantidadSolicitada": 2,
-  "estado": "PENDIENTE"
+  "descripcion": "Compra de equipos",
+  "cantidadSolicitada": 5,
+  "estado": "PENDIENTE",
+  "fecha": "2025-06-15T10:30:00"
 }
 ```
 
-Validaciones aplicadas:
-- Cantidad solicitada > 0
-- Número de pedido único
-- `productoId` requerido y debe existir en ms-logistics-base
-- Stock disponible suficiente
-- Ningún campo requerido puede ser nulo
-
 ### Listar Órdenes
+```http
+GET /api/pedidos/listar
+```
+
+**Respuesta (200 OK)**:
+```json
+[
+  {
+    "id": 1,
+    "numeroPedido": "PED-001",
+    "cliente": "Juan Pérez",
+    "descripcion": "Compra de equipos",
+    "cantidadSolicitada": 5,
+    "estado": "PENDIENTE",
+    "fecha": "2025-06-15T10:30:00"
+  },
+  {
+    "id": 2,
+    "numeroPedido": "PED-002",
+    "cliente": "María García",
+    "descripcion": "Reabastecimiento",
+    "cantidadSolicitada": 10,
+    "estado": "PROCESANDO",
+    "fecha": "2025-06-15T11:00:00"
+  }
+]
+```
+
+### Buscar Pedido por ID
+```http
+GET /api/pedidos/{id}
+```
+
+**Parámetros de ruta**:
+- `id` (requerido): ID del pedido
+
+**Respuesta (200 OK)**:
+```json
+{
+  "id": 1,
+  "numeroPedido": "PED-001",
+  "cliente": "Juan Pérez",
+  "descripcion": "Compra de equipos",
+  "cantidadSolicitada": 5,
+  "estado": "PENDIENTE",
+  "fecha": "2025-06-15T10:30:00"
+}
+```
+
+### Actualizar Estado
+```http
+PUT /api/pedidos/{id}/estado
+Content-Type: application/json
+
+{
+  "estado": "PROCESANDO"
+}
+```
+
+**Estados válidos**: PENDIENTE | PROCESANDO | COMPLETADO
+
+**Respuesta (200 OK)**:
+```json
+{
+  "id": 1,
+  "numeroPedido": "PED-001",
+  "cliente": "Juan Pérez",
+  "descripcion": "Compra de equipos",
+  "cantidadSolicitada": 5,
+  "estado": "PROCESANDO",
+  "fecha": "2025-06-15T10:30:00"
+}
+```
+
+## 🧪 Pruebas
+
+El servicio incluye **4 pruebas unitarias** con cobertura JaCoCo:
+
+```bash
+# Ejecutar pruebas
+mvn test
+
+# Ver cobertura
+mvn test jacoco:report
+# Acceder a: target/site/jacoco/index.html
+```
+
+**Tests incluidos**:
+1. Registrar pedido válido
+2. Listar pedidos
+3. Buscar pedido por ID
+4. Cambiar estado del pedido
+
+## 🚀 Ejecutar Localmente
+
+```bash
+# Instalar dependencias
+mvn clean install
+
+# Ejecutar servicio (requiere ms-logistics-base)
+mvn spring-boot:run
+```
+
+El servicio estará disponible en:
+- **API**: http://localhost:8082/api/pedidos
+- **Swagger**: http://localhost:8082/swagger-ui.html
+- **Health**: http://localhost:8082/actuator/health
+
+## 🔗 Dependencias
+
+**Requiere ms-logistics-base activo en:**
+- http://localhost:8081
+
+Esta integración se usa para:
+- Validar disponibilidad de stock
+- Consultar detalles de productos
+- Descontar automáticamente del inventario
+
+## 📊 Estructura de Base de Datos
+
+**Tabla: pedido**
+```sql
+CREATE TABLE pedido (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  numero_pedido VARCHAR(50) UNIQUE NOT NULL,
+  cliente VARCHAR(255) NOT NULL,
+  descripcion TEXT,
+  cantidad_solicitada INT NOT NULL,
+  estado VARCHAR(20) NOT NULL,
+  fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT check_cantidad CHECK (cantidad_solicitada > 0)
+);
+```
+
+## 📝 Flujo de Integración
+
+1. **Frontend** crea un pedido → POST /api/pedidos/registrar
+2. **ms-pedidos** valida cantidad > 0
+3. **ms-pedidos** consulta **ms-logistics-base** para verificar stock
+4. Si hay stock disponible:
+   - Registra el pedido como PENDIENTE
+   - Descuenta automáticamente del inventario
+5. Si NO hay stock:
+   - Rechaza la solicitud con error 400
+
+## 📝 Notas
+
+- Integración automática con ms-logistics-base
+- Validaciones a nivel de servicio
+- CORS configurado para localhost:5173
+- Swagger disponible automáticamente
 ```
 GET /api/pedidos/listar
 ```
