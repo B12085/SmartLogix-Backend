@@ -1,4 +1,0 @@
-# Asegúrate de que tu .gitignore incluya:
-.env
-.env.local
-.env.*.local
